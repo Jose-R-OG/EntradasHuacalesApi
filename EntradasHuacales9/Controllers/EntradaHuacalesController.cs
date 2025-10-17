@@ -33,13 +33,14 @@ namespace EntradasHuacales9.Controllers
             {
                 Fecha = DateTime.Now,
                 NombreCliente = entradasHuacales.NombreCliente,
-                EntradaHuacaleDetalle = entradasHuacales.Huacales.Select(h => new EntradasHuacalesDetalle
+                entradaHuacaleDetalle = entradasHuacales.Huacales.Select(h => new EntradasHuacalesDetalle
                 {
                     TipoId = h.IdTipo,
                     Cantidad = h.Cantidad,
                     Precio = h.Precio,
                 }).ToArray()
             };
+            await entradasHuacalesServices.Guardar(huacales);
         }
 
         // PUT api/<EntradaHuacalesController>/5

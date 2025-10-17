@@ -33,7 +33,7 @@ public class EntradasHuacalesServices(IDbContextFactory<Contexto> DbFactory)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         contexto.EntradasHuacales.Add(huacales);
-        await AfectarExistencia(huacales.EntradaHuacaleDetalle.ToArray(), TipoOperacion.Suma);
+        await AfectarExistencia(huacales.entradaHuacaleDetalle.ToArray(), TipoOperacion.Suma);
         return await contexto.SaveChangesAsync() > 0;
     }
 
@@ -41,19 +41,19 @@ public class EntradasHuacalesServices(IDbContextFactory<Contexto> DbFactory)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         var original = await contexto.EntradasHuacales
-            .Include(e => e.EntradaHuacaleDetalle)
+            .Include(e => e.entradaHuacaleDetalle)
             .AsNoTracking()
             .SingleOrDefaultAsync(e => e.IdEntrada == huacales.IdEntrada);
 
         if (original == null) return false;
 
-        await AfectarExistencia(original.EntradaHuacaleDetalle.ToArray(), TipoOperacion.Resta);
+        await AfectarExistencia(original.entradaHuacaleDetalle.ToArray(), TipoOperacion.Resta);
 
-        contexto.entradasHuacalesDetalles.RemoveRange(original.EntradaHuacaleDetalle);
+        contexto.entradasHuacalesDetalles.RemoveRange(original.entradaHuacaleDetalle);
 
         contexto.Update(huacales);
 
-        await AfectarExistencia(huacales.EntradaHuacaleDetalle.ToArray(), TipoOperacion.Suma);
+        await AfectarExistencia(huacales.entradaHuacaleDetalle.ToArray(), TipoOperacion.Suma);
 
         return await contexto.SaveChangesAsync() > 0;
     }
@@ -73,7 +73,7 @@ public class EntradasHuacalesServices(IDbContextFactory<Contexto> DbFactory)
     public async Task<EntradasHuacales?> Buscar(int idhuacales)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.EntradasHuacales.Include(e => e.EntradaHuacaleDetalle).FirstOrDefaultAsync(e => e.IdEntrada == idhuacales);
+        return await contexto.EntradasHuacales.Include(e => e.entradaHuacaleDetalle).FirstOrDefaultAsync(e => e.IdEntrada == idhuacales);
     }
 
     public async Task<bool> Eliminar(int idhuacales)
@@ -81,8 +81,8 @@ public class EntradasHuacalesServices(IDbContextFactory<Contexto> DbFactory)
         await using var contexto = await DbFactory.CreateDbContextAsync();
         var entrada = await Buscar(idhuacales);
 
-        await AfectarExistencia(entrada.EntradaHuacaleDetalle.ToArray(), TipoOperacion.Resta);
-        contexto.entradasHuacalesDetalles.RemoveRange(entrada.EntradaHuacaleDetalle);
+        await AfectarExistencia(entrada.entradaHuacaleDetalle.ToArray(), TipoOperacion.Resta);
+        contexto.entradasHuacalesDetalles.RemoveRange(entrada.entradaHuacaleDetalle);
         contexto.EntradasHuacales.Remove(entrada);
         return await contexto.SaveChangesAsync() > 0;
     }

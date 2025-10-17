@@ -13,6 +13,6 @@ public class TiposHuacales
     [Range(1, int.MaxValue, ErrorMessage = "La existencia debe ser igual o mayor 1")]
     public int Existencia { get; set; }
 
-    [InverseProperty("TipoHuacale")]
-    public virtual ICollection<EntradasHuacales> EntradaHuacale { get; set; } = new List<EntradasHuacales>();
+    [InverseProperty("TiposHuacales")]
+    public virtual ICollection<EntradasHuacalesDetalle> EntradaHuacaleDettalle { get; set; } = [];
 }
