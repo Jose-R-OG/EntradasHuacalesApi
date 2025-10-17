@@ -1,0 +1,6 @@
+@EntradasHuacalesApi8_HostAddress = http://localhost:5064
+
+GET {{EntradasHuacalesApi8_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
