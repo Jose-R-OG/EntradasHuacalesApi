@@ -45,14 +45,28 @@ namespace EntradasHuacales9.Controllers
 
         // PUT api/<EntradaHuacalesController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task Put(int id, [FromBody] EntradasHuacalesDto entradasHuacales)
         {
+            var huacales = new EntradasHuacales
+            {
+                IdEntrada = id,
+                Fecha = DateTime.Now,
+                NombreCliente = entradasHuacales.NombreCliente,
+                entradaHuacaleDetalle = entradasHuacales.Huacales.Select(h => new EntradasHuacalesDetalle
+                {
+                    TipoId = h.IdTipo,
+                    Cantidad = h.Cantidad,
+                    Precio = h.Precio,
+                }).ToArray()
+            };
+            await entradasHuacalesServices.Guardar(huacales);
         }
 
         // DELETE api/<EntradaHuacalesController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task Delete(int id)
         {
+            await entradasHuacalesServices.Eliminar(id);
         }
     }
 }

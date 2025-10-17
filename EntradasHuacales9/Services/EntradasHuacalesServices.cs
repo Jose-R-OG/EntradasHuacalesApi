@@ -33,7 +33,6 @@ public class EntradasHuacalesServices(IDbContextFactory<Contexto> DbFactory)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         contexto.EntradasHuacales.Add(huacales);
-        await AfectarExistencia(huacales.entradaHuacaleDetalle.ToArray(), TipoOperacion.Suma);
         return await contexto.SaveChangesAsync() > 0;
     }
 
