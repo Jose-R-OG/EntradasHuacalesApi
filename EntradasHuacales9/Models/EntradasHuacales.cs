@@ -13,5 +13,6 @@ public class EntradasHuacales
     public double Importe { get; set; }
 
     [InverseProperty("entradaHuacale")]
-    public virtual ICollection<EntradasHuacalesDetalle> entradaHuacaleDetalle { get; set; } = [];
+    public virtual ICollection<EntradasHuacalesDetalle> entradaHuacaleDetalle { get; set; } = new List<EntradasHuacalesDetalle>();
+
 }

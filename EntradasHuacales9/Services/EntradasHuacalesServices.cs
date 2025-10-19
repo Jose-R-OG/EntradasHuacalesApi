@@ -1,4 +1,5 @@
-﻿using EntradasHuacales9.DAL;
+﻿using EntradasHuacales9.Controllers;
+using EntradasHuacales9.DAL;
 using EntradasHuacales9.DTO;
 using EntradasHuacales9.Models;
 using Microsoft.EntityFrameworkCore;
@@ -28,32 +29,33 @@ public class EntradasHuacalesServices(IDbContextFactory<Contexto> DbFactory)
         }
     }
 
-
     private async Task<bool> Insertar(EntradasHuacales huacales)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         contexto.EntradasHuacales.Add(huacales);
+        await AfectarExistencia(huacales.entradaHuacaleDetalle.ToArray(), TipoOperacion.Suma);
         return await contexto.SaveChangesAsync() > 0;
     }
 
-    private async Task<bool> Modificar(EntradasHuacales huacales)
+    private async Task<bool> Modificar(EntradasHuacales huacalesNuevos)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        var original = await contexto.EntradasHuacales
+
+        var huacalesActuales = await contexto.EntradasHuacales
             .Include(e => e.entradaHuacaleDetalle)
-            .AsNoTracking()
-            .SingleOrDefaultAsync(e => e.IdEntrada == huacales.IdEntrada);
+            .FirstOrDefaultAsync(e => e.IdEntrada == huacalesNuevos.IdEntrada);
 
-        if (original == null) return false;
+        if (huacalesActuales == null)
+        {
+            return false; 
+        }
 
-        await AfectarExistencia(original.entradaHuacaleDetalle.ToArray(), TipoOperacion.Resta);
-
-        contexto.entradasHuacalesDetalles.RemoveRange(original.entradaHuacaleDetalle);
-
-        contexto.Update(huacales);
-
-        await AfectarExistencia(huacales.entradaHuacaleDetalle.ToArray(), TipoOperacion.Suma);
-
+        await AfectarExistencia(huacalesActuales.entradaHuacaleDetalle.ToArray(), TipoOperacion.Resta);
+        huacalesActuales.NombreCliente = huacalesNuevos.NombreCliente;
+        huacalesActuales.Fecha = DateTime.Now; 
+        contexto.entradasHuacalesDetalles.RemoveRange(huacalesActuales.entradaHuacaleDetalle);
+        huacalesActuales.entradaHuacaleDetalle = huacalesNuevos.entradaHuacaleDetalle;
+        await AfectarExistencia(huacalesActuales.entradaHuacaleDetalle.ToArray(), TipoOperacion.Suma);
         return await contexto.SaveChangesAsync() > 0;
     }
 
@@ -98,10 +100,18 @@ public class EntradasHuacalesServices(IDbContextFactory<Contexto> DbFactory)
             .ToArrayAsync();
     }
 
-    public async Task<List<TiposHuacales>> ListarTipos()
+    public async Task<TiposHuacalesDto[]> ListarTipos(Expression<Func<TiposHuacales, bool>> criterio)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.TiposHuacales.Where(t => t.TipoId > 0).AsNoTracking().ToListAsync();
+        return await contexto.TiposHuacales
+            .Where(criterio)
+            .Select(t => new TiposHuacalesDto
+        {
+            TipoId = t.TipoId,
+            Existencia = t.Existencia,
+            Descripcion = t.Descripcion
+        }
+        ).ToArrayAsync();
     }
 
     public enum TipoOperacion

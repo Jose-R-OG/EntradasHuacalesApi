@@ -19,16 +19,15 @@ builder.Services.AddScoped<EntradasHuacalesServices>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.MapOpenApi();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Entrada Huacales API");
+    c.RoutePrefix = "swagger";
+});
 
 app.UseHttpsRedirection();
-app.UseAuthorization(); // Es buena práctica añadirlo también
+app.UseAuthorization(); 
 
 app.MapControllers();
 

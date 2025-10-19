@@ -20,9 +20,9 @@ namespace EntradasHuacales9.Controllers
 
         // GET api/<EntradaHuacalesController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<EntradasHuacalesDto[]> Get(int id)
         {
-            return "value";
+            return await entradasHuacalesServices.Listar(h => h.IdEntrada == id);
         }
 
         // POST api/<EntradaHuacalesController>
@@ -57,7 +57,7 @@ namespace EntradasHuacales9.Controllers
                     TipoId = h.IdTipo,
                     Cantidad = h.Cantidad,
                     Precio = h.Precio,
-                }).ToArray()
+                }).ToList() 
             };
             await entradasHuacalesServices.Guardar(huacales);
         }
